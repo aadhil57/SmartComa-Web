@@ -2901,7 +2901,6 @@ elif page == "🧑‍⚕️ Physiotherapy":
         )
     )
 
-    # Actual AI prediction values used by the application
     prediction_probability = st.session_state.get(
         "prediction",
         None
@@ -2944,18 +2943,12 @@ elif page == "🧑‍⚕️ Physiotherapy":
 
     rosc = patient_clinical.get(
         "ROSC",
-        patient_clinical.get(
-            "rosc",
-            None
-        )
+        patient_clinical.get("rosc", None)
     )
 
     ohca = patient_clinical.get(
         "OHCA",
-        patient_clinical.get(
-            "ohca",
-            None
-        )
+        patient_clinical.get("ohca", None)
     )
 
     shockable = patient_clinical.get(
@@ -2970,10 +2963,10 @@ elif page == "🧑‍⚕️ Physiotherapy":
     )
 
     # ========================================================
-    # SAFE VALUE HELPER
+    # SAFE DISPLAY HELPER
     # ========================================================
 
-    def safe_value(value, default="Not available"):
+    def safe_value(value, default="N/A"):
 
         if value is None:
             return default
@@ -2992,6 +2985,7 @@ elif page == "🧑‍⚕️ Physiotherapy":
 
     st.html("""
         <div class="topbar">
+
             <div class="main-title">
                 Physiotherapy Support
             </div>
@@ -3000,28 +2994,30 @@ elif page == "🧑‍⚕️ Physiotherapy":
                 Patient-specific AI-assisted rehabilitation
                 monitoring for clinician review
             </div>
+
         </div>
     """)
 
     st.html(f"""
         <div style="
-            padding:14px 18px;
-            border-radius:12px;
-            background:rgba(255,255,255,0.04);
+            margin-top:12px;
             margin-bottom:20px;
+            font-size:17px;
+            font-weight:700;
         ">
-            <b>Active Patient:</b> {patient_id}
-            <br>
-            <span style="opacity:0.75;">
-                AI-assisted rehabilitation support for
-                clinician review
-            </span>
+            Active Patient: {patient_id}
         </div>
     """)
 
     # ========================================================
     # PATIENT REHABILITATION CONTEXT
     # ========================================================
+
+    st.html("""
+        <div class="section-title">
+            AI-assisted rehabilitation support for clinician review
+        </div>
+    """)
 
     st.html("""
         <div class="section-title">
@@ -3041,33 +3037,17 @@ elif page == "🧑‍⚕️ Physiotherapy":
 
             try:
 
-                probability_value = float(
-                    prediction_probability
+                probability_text = (
+                    f"{float(prediction_probability) * 100:.1f}%"
                 )
-
-                if np.isfinite(probability_value):
-
-                    probability_text = (
-                        f"{probability_value * 100:.1f}%"
-                    )
-
-                else:
-
-                    probability_text = (
-                        "AI Analysis Required"
-                    )
 
             except (TypeError, ValueError):
 
-                probability_text = (
-                    "AI Analysis Required"
-                )
+                probability_text = "AI Analysis Required"
 
         else:
 
-            probability_text = (
-                "AI Analysis Required"
-            )
+            probability_text = "AI Analysis Required"
 
         st.metric(
             "AI Probability",
@@ -3103,21 +3083,21 @@ elif page == "🧑‍⚕️ Physiotherapy":
 
             try:
 
-                movement_display = (
+                movement_text = (
                     f"{float(movement_value):.2f}"
                 )
 
             except (TypeError, ValueError):
 
-                movement_display = "Not available"
+                movement_text = "N/A"
 
         else:
 
-            movement_display = "Not available"
+            movement_text = "N/A"
 
         st.metric(
             "Movement",
-            movement_display
+            movement_text
         )
 
     # --------------------------------------------------------
@@ -3130,21 +3110,21 @@ elif page == "🧑‍⚕️ Physiotherapy":
 
             try:
 
-                heart_rate_display = (
+                heart_rate_text = (
                     f"{float(heart_rate):.1f} BPM"
                 )
 
             except (TypeError, ValueError):
 
-                heart_rate_display = "Not available"
+                heart_rate_text = "N/A"
 
         else:
 
-            heart_rate_display = "Not available"
+            heart_rate_text = "N/A"
 
         st.metric(
             "Heart Rate",
-            heart_rate_display
+            heart_rate_text
         )
 
     st.html("<br>")
@@ -3156,48 +3136,36 @@ elif page == "🧑‍⚕️ Physiotherapy":
     p1, p2 = st.columns(2)
 
     # ========================================================
-    # PATIENT CONTEXT
+    # PATIENT CONTEXT BOX
     # ========================================================
 
     with p1:
 
         age_display = safe_value(age)
 
-        if age_display != "Not available":
+        if age_display != "N/A":
 
             try:
-
                 age_display = (
                     f"{float(age_display):.0f} years"
                 )
-
             except (TypeError, ValueError):
-
                 pass
 
-        temperature_display = safe_value(
-            temperature
-        )
+        temp_display = safe_value(temperature)
 
-        if temperature_display != "Not available":
+        if temp_display != "N/A":
 
             try:
-
-                temperature_display = (
-                    f"{float(temperature_display):.2f} °C"
+                temp_display = (
+                    f"{float(temp_display):.2f} °C"
                 )
-
             except (TypeError, ValueError):
-
                 pass
 
         rosc_display = safe_value(rosc)
-
         ohca_display = safe_value(ohca)
-
-        shockable_display = safe_value(
-            shockable
-        )
+        shockable_display = safe_value(shockable)
 
         st.html(f"""
             <div class="card">
@@ -3218,7 +3186,7 @@ elif page == "🧑‍⚕️ Physiotherapy":
                     <br>
 
                     <b>Body Temperature:</b>
-                    {temperature_display}
+                    {temp_display}
 
                     <br>
 
@@ -3241,7 +3209,7 @@ elif page == "🧑‍⚕️ Physiotherapy":
         """)
 
     # ========================================================
-    # MOVEMENT MONITORING
+    # MOVEMENT MONITORING BOX
     # ========================================================
 
     with p2:
@@ -3250,73 +3218,59 @@ elif page == "🧑‍⚕️ Physiotherapy":
 
             try:
 
-                movement_number = float(
-                    movement_value
+                movement_display = (
+                    f"{float(movement_value):.3f}"
                 )
+
+                if float(movement_value) < 0.30:
+
+                    movement_category = (
+                        "Low Mobility"
+                    )
+
+                    movement_note = (
+                        "Low movement level observed "
+                        "in the stored monitoring data."
+                    )
+
+                elif float(movement_value) < 0.70:
+
+                    movement_category = (
+                        "Moderate Mobility"
+                    )
+
+                    movement_note = (
+                        "Moderate movement level observed "
+                        "in the stored monitoring data."
+                    )
+
+                else:
+
+                    movement_category = (
+                        "Higher Mobility"
+                    )
+
+                    movement_note = (
+                        "Higher movement level observed "
+                        "in the stored monitoring data."
+                    )
 
             except (TypeError, ValueError):
 
-                movement_number = None
+                movement_display = "N/A"
+                movement_category = "Unavailable"
+
+                movement_note = (
+                    "Movement data is not currently available."
+                )
 
         else:
 
-            movement_number = None
-
-        if movement_number is None:
-
-            movement_display = "Not available"
-
-            movement_category = (
-                "Unavailable"
-            )
+            movement_display = "N/A"
+            movement_category = "Unavailable"
 
             movement_note = (
                 "Movement data is not currently available."
-            )
-
-        elif movement_number < 0.30:
-
-            movement_display = (
-                f"{movement_number:.3f}"
-            )
-
-            movement_category = (
-                "Low Mobility"
-            )
-
-            movement_note = (
-                "Low movement level observed "
-                "in the stored monitoring data."
-            )
-
-        elif movement_number < 0.70:
-
-            movement_display = (
-                f"{movement_number:.3f}"
-            )
-
-            movement_category = (
-                "Moderate Mobility"
-            )
-
-            movement_note = (
-                "Moderate movement level observed "
-                "in the stored monitoring data."
-            )
-
-        else:
-
-            movement_display = (
-                f"{movement_number:.3f}"
-            )
-
-            movement_category = (
-                "Higher Mobility"
-            )
-
-            movement_note = (
-                "Higher movement level observed "
-                "in the stored monitoring data."
             )
 
         st.html(f"""
@@ -3369,9 +3323,25 @@ elif page == "🧑‍⚕️ Physiotherapy":
     # RECOMMENDATION LOGIC
     # ========================================================
 
-    if movement_number is not None:
+    if movement_value is not None:
 
-        if movement_number < 0.30:
+        try:
+
+            movement_numeric = float(
+                movement_value
+            )
+
+        except (TypeError, ValueError):
+
+            movement_numeric = None
+
+    else:
+
+        movement_numeric = None
+
+    if movement_numeric is not None:
+
+        if movement_numeric < 0.30:
 
             recommendation_type = (
                 "Low-Mobility Rehabilitation Support"
@@ -3379,10 +3349,10 @@ elif page == "🧑‍⚕️ Physiotherapy":
 
             recommendation_reason = (
                 f"Movement mean is "
-                f"{movement_number:.3f}. "
-                "The system has selected a "
-                "low-mobility rehabilitation "
-                "education category for clinician review."
+                f"{movement_numeric:.3f}. "
+                "The system has selected a low-mobility "
+                "rehabilitation education category for "
+                "clinician review."
             )
 
             video_title = (
@@ -3396,7 +3366,7 @@ elif page == "🧑‍⚕️ Physiotherapy":
                 "+mobility+exercises+physiotherapy"
             )
 
-        elif movement_number < 0.70:
+        elif movement_numeric < 0.70:
 
             recommendation_type = (
                 "Supported Mobility Rehabilitation"
@@ -3404,10 +3374,10 @@ elif page == "🧑‍⚕️ Physiotherapy":
 
             recommendation_reason = (
                 f"Movement mean is "
-                f"{movement_number:.3f}. "
-                "The system has selected a "
-                "supported mobility rehabilitation "
-                "education category for clinician review."
+                f"{movement_numeric:.3f}. "
+                "The system has selected a supported "
+                "mobility rehabilitation education "
+                "category for clinician review."
             )
 
             video_title = (
@@ -3429,10 +3399,10 @@ elif page == "🧑‍⚕️ Physiotherapy":
 
             recommendation_reason = (
                 f"Movement mean is "
-                f"{movement_number:.3f}. "
-                "The system has selected an "
-                "active mobility rehabilitation "
-                "education category for clinician review."
+                f"{movement_numeric:.3f}. "
+                "The system has selected an active "
+                "mobility rehabilitation education "
+                "category for clinician review."
             )
 
             video_title = (
@@ -3529,7 +3499,7 @@ elif page == "🧑‍⚕️ Physiotherapy":
     st.html("<br>")
 
     # ========================================================
-    # CLINICIAN REVIEW
+    # CLINICIAN REVIEW PROTOCOL
     # ========================================================
 
     st.html("""
@@ -3640,6 +3610,10 @@ elif page == "🧑‍⚕️ Physiotherapy":
 
         st.html("<br>")
 
+        # ----------------------------------------------------
+        # CLINICAL ESCALATION
+        # ----------------------------------------------------
+
         if prediction_status == "POOR":
 
             escalation_title = (
@@ -3709,51 +3683,33 @@ elif page == "🧑‍⚕️ Physiotherapy":
     st.html("<br>")
 
     # ========================================================
-    # FINAL INFORMATION
+    # SINGLE FINAL DISCLAIMER
     # ========================================================
 
     st.html("""
-        <div style="
-            padding:16px;
-            border-radius:12px;
-            background:rgba(255,255,255,0.04);
-            line-height:1.6;
-            font-size:14px;
-            opacity:0.85;
-        ">
+        <div class="card">
 
-            🧑‍⚕️ <b>Clinician Review Required</b><br><br>
+            <div class="card-title">
+                🧑‍⚕️ Clinician Review Required
+            </div>
 
-            The Smart Coma Patient Monitoring System provides
-            AI-assisted rehabilitation-support information
-            and educational video recommendations.
+            <div style="
+                margin-top:12px;
+                line-height:1.7;
+                font-size:15px;
+            ">
 
-            <br><br>
+                The Smart Coma Patient Monitoring System
+                provides AI-assisted rehabilitation-support
+                information and educational video
+                recommendations.
 
-            It does not autonomously diagnose, prescribe,
-            or order treatment.
+                <br><br>
 
-        </div>
-    """)
-    # ========================================================
-    # FINAL DISCLAIMER
-    # ========================================================
+                It does not autonomously diagnose, prescribe,
+                or order treatment.
 
-    st.html("""
-        <div class="warning-box">
-
-            🧑‍⚕️ <b>Clinician Review Required</b>
-
-            <br><br>
-
-            The Smart Coma Patient Monitoring System provides
-            AI-assisted rehabilitation-support information
-            and educational video recommendations.
-
-            <br><br>
-
-            It does not autonomously diagnose, prescribe,
-            or order treatment.
+            </div>
 
         </div>
     """)
