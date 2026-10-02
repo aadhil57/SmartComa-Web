@@ -1995,8 +1995,7 @@ elif page == "📂 Stored Patient Demo":
                         dtype=np.float32
                     ).reshape(1, -1)
 
-
- pred = model.predict(
+                    pred = model.predict(
                         {
                             "eeg_input": eeg_input,
                             "iot_input": iot_input,
