@@ -2996,7 +2996,9 @@ elif page == "🧑‍⚕️ Physiotherapy":
     with c2:
         st.metric(
             "AI Status",
-            prediction_status if prediction_status else "N/A"
+            prediction_status
+            if prediction_status
+            else "N/A"
         )
 
     with c3:
@@ -3020,7 +3022,7 @@ elif page == "🧑‍⚕️ Physiotherapy":
     st.html("<br>")
 
     # ========================================================
-    # PATIENT CLINICAL / MONITORING CONTEXT
+    # PATIENT CLINICAL CONTEXT
     # ========================================================
 
     p1, p2 = st.columns(2)
@@ -3076,8 +3078,8 @@ elif page == "🧑‍⚕️ Physiotherapy":
 
             if movement_value < 0.30:
                 movement_note = (
-                    "Low movement level detected in the "
-                    "stored monitoring data."
+                    "Low movement level detected "
+                    "in the stored monitoring data."
                 )
             elif movement_value < 0.70:
                 movement_note = (
@@ -3103,6 +3105,189 @@ elif page == "🧑‍⚕️ Physiotherapy":
             )
 
         st.html("</div>")
+
+    st.html("<br>")
+
+    # ========================================================
+    # AI-ASSISTED REHABILITATION VIDEO RECOMMENDATION
+    # ========================================================
+
+    st.html(
+        '<div class="section-title">'
+        '🤖 AI-Assisted Rehabilitation Recommendation'
+        '</div>'
+    )
+
+    # --------------------------------------------------------
+    # Recommendation logic
+    # --------------------------------------------------------
+
+    if movement_value is not None:
+
+        if movement_value < 0.30:
+
+            recommendation_type = (
+                "Low-Mobility Rehabilitation Support"
+            )
+
+            recommendation_reason = (
+                "The stored movement level is relatively low. "
+                "A low-mobility rehabilitation resource is "
+                "therefore selected for clinician review."
+            )
+
+            video_title = (
+                "Stroke Rehabilitation – "
+                "Mobility and Movement Exercises"
+            )
+
+            video_url = (
+                "https://www.youtube.com/results"
+                "?search_query=stroke+rehabilitation"
+                "+mobility+exercises+physiotherapy"
+            )
+
+        elif movement_value < 0.70:
+
+            recommendation_type = (
+                "Supported Mobility Rehabilitation"
+            )
+
+            recommendation_reason = (
+                "The stored movement level is in the "
+                "moderate range. A supported mobility "
+                "rehabilitation resource is selected for "
+                "clinician review."
+            )
+
+            video_title = (
+                "Stroke Rehabilitation – "
+                "Standing and Mobility Exercises"
+            )
+
+            video_url = (
+                "https://www.youtube.com/results"
+                "?search_query=stroke+rehabilitation"
+                "+standing+mobility+exercises"
+            )
+
+        else:
+
+            recommendation_type = (
+                "Active Mobility Rehabilitation Support"
+            )
+
+            recommendation_reason = (
+                "The stored movement level is relatively "
+                "higher. An active mobility rehabilitation "
+                "resource is selected for clinician review."
+            )
+
+            video_title = (
+                "Stroke Rehabilitation – "
+                "Balance and Mobility Exercises"
+            )
+
+            video_url = (
+                "https://www.youtube.com/results"
+                "?search_query=stroke+rehabilitation"
+                "+balance+mobility+exercises"
+            )
+
+    else:
+
+        recommendation_type = (
+            "General Rehabilitation Education"
+        )
+
+        recommendation_reason = (
+            "Movement data is unavailable, so the system "
+            "cannot select a movement-specific category."
+        )
+
+        video_title = (
+            "Stroke Rehabilitation – "
+            "General Physiotherapy Education"
+        )
+
+        video_url = (
+            "https://www.youtube.com/results"
+            "?search_query=stroke+rehabilitation"
+            "+physiotherapy+education"
+        )
+
+    # --------------------------------------------------------
+    # Recommendation card
+    # --------------------------------------------------------
+
+    st.html(f"""
+        <div class="card">
+
+            <div class="card-title">
+                🎥 AI VIDEO RECOMMENDATION
+            </div>
+
+            <div style="
+                font-size:22px;
+                font-weight:800;
+                margin-top:10px;
+            ">
+                {recommendation_type}
+            </div>
+
+            <div class="card-small" style="
+                margin-top:12px;
+                font-size:16px;
+            ">
+                <b>Why this category was selected:</b><br>
+                {recommendation_reason}
+            </div>
+
+            <div style="
+                margin-top:18px;
+                font-size:18px;
+                font-weight:700;
+            ">
+                Recommended Resource
+            </div>
+
+            <div class="card-small">
+                {video_title}
+            </div>
+
+        </div>
+    """)
+
+    st.html("<br>")
+
+    # --------------------------------------------------------
+    # Video button
+    # --------------------------------------------------------
+
+    st.link_button(
+        "▶ Watch Recommended Rehabilitation Video",
+        video_url,
+        width="stretch"
+    )
+
+    st.html("""
+        <div class="warning-box" style="margin-top:15px;">
+
+        ⚠️ <b>Clinician Review Required</b><br><br>
+
+        The AI recommendation is based on the patient's
+        stored monitoring context and is intended to identify
+        an educational rehabilitation category.
+
+        The system does <b>not</b> prescribe exercises,
+        treatment intensity, duration, frequency or dosage.
+
+        A qualified physiotherapist or clinician must decide
+        whether the recommended resource is appropriate for
+        the individual patient.
+
+        </div>
+    """)
 
     st.html("<br>")
 
@@ -3192,7 +3377,6 @@ elif page == "🧑‍⚕️ Physiotherapy":
 
         st.html("<br>")
 
-        # Dynamic escalation card
         if (
             prediction_status == "POOR"
             or (
@@ -3207,7 +3391,7 @@ elif page == "🧑‍⚕️ Physiotherapy":
 
             escalation_text = (
                 "AI output indicates a higher-risk classification "
-                "according to the frozen project threshold. "
+                "according to the project decision threshold. "
                 "The responsible clinical team should review "
                 "the patient before rehabilitation decisions."
             )
@@ -3247,26 +3431,23 @@ elif page == "🧑‍⚕️ Physiotherapy":
     st.html("<br>")
 
     # ========================================================
-    # IMPORTANT PROJECT DISCLAIMER
+    # FINAL DISCLAIMER
     # ========================================================
 
     st.html("""
         <div class="warning-box">
+
         🧑‍⚕️ <b>Clinician Review Required</b><br><br>
 
-        The physiotherapy module is an AI-assisted monitoring
-        component of the Smart Coma Patient Monitoring System.
-        It is intended to help organize patient monitoring
-        information for clinical review.
+        The Smart Coma Patient Monitoring System provides
+        AI-assisted rehabilitation-support information and
+        educational video recommendations.
 
-        Rehabilitation exercises, positioning, passive ROM,
-        frequency, intensity and escalation decisions must be
-        determined by qualified healthcare professionals based
-        on the complete clinical assessment.
+        It does not autonomously diagnose, prescribe,
+        or order treatment.
+
         </div>
     """)
-
-
 # ============================================================
 # ABOUT
 # ============================================================
