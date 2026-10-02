@@ -1057,15 +1057,13 @@ STORED_EEG_ZIP = "/content/drive/MyDrive/SmartComa_EEG/EEG_200_Patients.zip"
 STORED_HEA_ZIP = "/content/drive/MyDrive/SmartComa_EEG/EEG_200_Metadata.zip"
 STORED_IOT_CSV = "/content/drive/MyDrive/SmartComa_EEG/synthetic_iot_200_patients.csv"
 STORED_CLINICAL_CSV = "/content/drive/MyDrive/SmartComa_EEG/SmartComa_Clinical_200_Patients.csv"
-STORED_MASTER_CSV = "/content/drive/MyDrive/SmartComa_EEG/SmartComa_Master_200_Patient_Map.csv"
-
+STORED_MASTER_CSV = "data/SmartComa_Master_200_Patient_Map.csv"
 
 @st.cache_data(show_spinner=False)
 def load_stored_patient_ids():
     master = pd.read_csv(STORED_MASTER_CSV)
     ids = master["Patient_ID"].astype(str).str.zfill(4).tolist()
     return sorted(ids)
-
 
 @st.cache_data(show_spinner=False)
 def load_stored_clinical():
