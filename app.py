@@ -1671,7 +1671,7 @@ if page == "🏠 Dashboard":
             </div>
             """)
 
-    with right:
+        with right:
 
         st.html(f"""
             <div class="ai-panel">
@@ -1708,57 +1708,6 @@ if page == "🏠 Dashboard":
                 are integrated before prediction.
             </div>
             """)
-
-    st.html(
-        '<div class="section-title">AI Processing Pipeline</div>'
-    )
-
-    st.html("""
-        <div class="pipeline">
-
-            <div class="pipeline-item">
-                📥 EEG
-            </div>
-
-            <div class="pipeline-arrow">→</div>
-
-            <div class="pipeline-item">
-                🧹 Preprocessing
-            </div>
-
-            <div class="pipeline-arrow">→</div>
-
-            <div class="pipeline-item">
-                🧠 EEG Encoder
-            </div>
-
-            <div class="pipeline-arrow">→</div>
-
-            <div class="pipeline-item">
-                📡 IoT Features
-            </div>
-
-            <div class="pipeline-arrow">→</div>
-
-            <div class="pipeline-item">
-                🩺 Clinical Features
-            </div>
-
-            <div class="pipeline-arrow">→</div>
-
-            <div class="pipeline-item">
-                🤖 Fusion AI
-            </div>
-
-            <div class="pipeline-arrow">→</div>
-
-            <div class="pipeline-item">
-                📊 Patient Result
-            </div>
-
-        </div>
-        """)
-
 
 # ============================================================
 # PATIENT ANALYSIS
