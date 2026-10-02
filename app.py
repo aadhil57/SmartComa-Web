@@ -1550,58 +1550,99 @@ if page == "🏠 Dashboard":
         <div class="topbar">
             <div class="main-title">
                 SmartComa AI Monitoring Center
-            </div>
-            <div class="subtitle">
-                Multimodal clinical decision-support dashboard
-                for coma patient monitoring
-            </div>
-        </div>
-        """)
+    patient_id = st.session_state.get(
+        "active_patient_id",
+        st.session_state.get(
+            "selected_dashboard_patient",
+            "0299"
+        )
+    )
+
+    patient_iot = st.session_state.get(
+        "active_patient_iot",
+        {}
+    ) or {}
+
+    heart_rate = patient_iot.get(
+        "heart_rate_mean",
+        None
+    )
+
+    temperature = patient_iot.get(
+        "body_temperature_mean",
+        None
+    )
+
+    prediction = st.session_state.get(
+        "prediction",
+        None
+    )
+
+    patient_status = st.session_state.get(
+        "patient_status",
+        "GOOD"
+    )
+
+    if prediction is not None:
+        try:
+            probability_text = f"{float(prediction) * 100:.2f}%"
+        except:
+            probability_text = "N/A"
+    else:
+        probability_text = "N/A"
 
     c1, c2, c3, c4 = st.columns(4)
 
     with c1:
-        st.html("""
+        st.html(f"""
             <div class="card">
                 <div class="card-title">Patient</div>
-                <div class="card-value">0299</div>
+                <div class="card-value">{patient_id}</div>
                 <div class="card-small">
-                    Active demonstration case
+                    Active patient
                 </div>
             </div>
             """)
 
     with c2:
-        st.html("""
+        st.html(f"""
             <div class="card">
                 <div class="card-title">Heart Rate</div>
-                <div class="card-value">76 BPM</div>
+                <div class="card-value">
+                    {f"{heart_rate:.2f} BPM"
+                     if heart_rate is not None
+                     else "N/A"}
+                </div>
                 <div class="card-small">
-                    IoT demonstration data
+                    Stored IoT data
                 </div>
             </div>
             """)
 
     with c3:
-        st.html("""
+        st.html(f"""
             <div class="card">
                 <div class="card-title">Temperature</div>
-                <div class="card-value">36.56 °C</div>
+                <div class="card-value">
+                    {f"{temperature:.2f} °C"
+                     if temperature is not None
+                     else "N/A"}
+                </div>
                 <div class="card-small">
-                    IoT demonstration data
+                    Stored IoT data
                 </div>
             </div>
             """)
 
     with c4:
-        st.html("""
+        st.html(f"""
             <div class="card">
                 <div class="card-title">AI Status</div>
                 <div class="card-value good">
-                    GOOD
+                    {patient_status}
                 </div>
                 <div class="card-small">
-                    Demo probability 33.96%
+                    AI probability {probability_text}
                 </div>
             </div>
             """)
@@ -1632,7 +1673,7 @@ if page == "🏠 Dashboard":
 
     with right:
 
-        st.html("""
+        st.html(f"""
             <div class="ai-panel">
                 <div class="card-title">
                     MULTIMODAL AI
@@ -1643,12 +1684,12 @@ if page == "🏠 Dashboard":
                     font-weight:800;
                     margin-top:8px;
                 ">
-                    33.96%
+                    {probability_text}
                 </div>
 
                 <div class="good"
                      style="font-size:18px;">
-                    GOOD OUTCOME CLASS
+                    {patient_status} OUTCOME CLASS
                 </div>
 
                 <br>
