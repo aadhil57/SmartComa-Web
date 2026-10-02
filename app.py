@@ -1550,6 +1550,15 @@ if page == "🏠 Dashboard":
         <div class="topbar">
             <div class="main-title">
                 SmartComa AI Monitoring Center
+            </div>
+            <div class="subtitle">
+                Multimodal clinical decision-support dashboard
+                for coma patient monitoring
+            </div>
+        </div>
+        """)
+
+    # Active patient
     patient_id = st.session_state.get(
         "active_patient_id",
         st.session_state.get(
@@ -1558,6 +1567,7 @@ if page == "🏠 Dashboard":
         )
     )
 
+    # IoT data
     patient_iot = st.session_state.get(
         "active_patient_iot",
         {}
@@ -1573,6 +1583,7 @@ if page == "🏠 Dashboard":
         None
     )
 
+    # AI prediction
     prediction = st.session_state.get(
         "prediction",
         None
@@ -1583,21 +1594,37 @@ if page == "🏠 Dashboard":
         "GOOD"
     )
 
+    # Display values
+    if heart_rate is not None:
+        heart_rate_text = f"{heart_rate:.2f} BPM"
+    else:
+        heart_rate_text = "N/A"
+
+    if temperature is not None:
+        temperature_text = f"{temperature:.2f} °C"
+    else:
+        temperature_text = "N/A"
+
     if prediction is not None:
         try:
-            probability_text = f"{float(prediction) * 100:.2f}%"
-        except:
+            probability_text = (
+                f"{float(prediction) * 100:.2f}%"
+            )
+        except Exception:
             probability_text = "N/A"
     else:
         probability_text = "N/A"
 
+    # Dashboard cards
     c1, c2, c3, c4 = st.columns(4)
 
     with c1:
         st.html(f"""
             <div class="card">
                 <div class="card-title">Patient</div>
-                <div class="card-value">{patient_id}</div>
+                <div class="card-value">
+                    {patient_id}
+                </div>
                 <div class="card-small">
                     Active patient
                 </div>
@@ -1607,11 +1634,11 @@ if page == "🏠 Dashboard":
     with c2:
         st.html(f"""
             <div class="card">
-                <div class="card-title">Heart Rate</div>
+                <div class="card-title">
+                    Heart Rate
+                </div>
                 <div class="card-value">
-                    {f"{heart_rate:.2f} BPM"
-                     if heart_rate is not None
-                     else "N/A"}
+                    {heart_rate_text}
                 </div>
                 <div class="card-small">
                     Stored IoT data
@@ -1622,11 +1649,11 @@ if page == "🏠 Dashboard":
     with c3:
         st.html(f"""
             <div class="card">
-                <div class="card-title">Temperature</div>
+                <div class="card-title">
+                    Temperature
+                </div>
                 <div class="card-value">
-                    {f"{temperature:.2f} °C"
-                     if temperature is not None
-                     else "N/A"}
+                    {temperature_text}
                 </div>
                 <div class="card-small">
                     Stored IoT data
@@ -1637,7 +1664,9 @@ if page == "🏠 Dashboard":
     with c4:
         st.html(f"""
             <div class="card">
-                <div class="card-title">AI Status</div>
+                <div class="card-title">
+                    AI Status
+                </div>
                 <div class="card-value good">
                     {patient_status}
                 </div>
@@ -1671,10 +1700,11 @@ if page == "🏠 Dashboard":
             </div>
             """)
 
-        with right:
+    with right:
 
         st.html(f"""
             <div class="ai-panel">
+
                 <div class="card-title">
                     MULTIMODAL AI
                 </div>
@@ -1706,8 +1736,71 @@ if page == "🏠 Dashboard":
 
                 EEG + IoT + Clinical information
                 are integrated before prediction.
+
             </div>
             """)
+
+    st.html(
+        '<div class="section-title">AI Processing Pipeline</div>'
+    )
+
+    st.html("""
+        <div class="pipeline">
+
+            <div class="pipeline-item">
+                📥 EEG
+            </div>
+
+            <div class="pipeline-arrow">
+                →
+            </div>
+
+            <div class="pipeline-item">
+                🧹 Preprocessing
+            </div>
+
+            <div class="pipeline-arrow">
+                →
+            </div>
+
+            <div class="pipeline-item">
+                🧠 EEG Encoder
+            </div>
+
+            <div class="pipeline-arrow">
+                →
+            </div>
+
+            <div class="pipeline-item">
+                📡 IoT Features
+            </div>
+
+            <div class="pipeline-arrow">
+                →
+            </div>
+
+            <div class="pipeline-item">
+                🩺 Clinical Features
+            </div>
+
+            <div class="pipeline-arrow">
+                →
+            </div>
+
+            <div class="pipeline-item">
+                🤖 Fusion AI
+            </div>
+
+            <div class="pipeline-arrow">
+                →
+            </div>
+
+            <div class="pipeline-item">
+                📊 Patient Result
+            </div>
+
+        </div>
+        """)
 
 # ============================================================
 # PATIENT ANALYSIS
