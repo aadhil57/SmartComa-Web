@@ -1995,16 +1995,28 @@ elif page == "📂 Stored Patient Demo":
                         dtype=np.float32
                     ).reshape(1, -1)
 
-                    pred = model.predict(
-                        {
-                            "eeg_input": eeg_input,
-                            "iot_input": iot_input,
-                            "clinical_input": clinical_input
-                        },
-                        verbose=0
-                    )[0][0]
+                  if not np.isfinite(eeg_input).all():
+    raise ValueError("EEG input contains NaN or Inf")
 
-                    probs.append(float(pred))
+if not np.isfinite(iot_input).all():
+    raise ValueError("IoT input contains NaN or Inf")
+
+if not np.isfinite(clinical_input).all():
+    raise ValueError("Clinical input contains NaN or Inf")
+
+pred = model.predict(
+    {
+        "eeg_input": eeg_input,
+        "iot_input": iot_input,
+        "clinical_input": clinical_input
+    },
+    verbose=0
+)[0][0]
+
+if not np.isfinite(pred):
+    raise ValueError(f"Model prediction is NaN/Inf: {pred}")
+
+probs.append(float(pred))
 
                 probability = float(np.mean(probs))
 
