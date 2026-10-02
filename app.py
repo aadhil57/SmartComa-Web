@@ -1090,7 +1090,41 @@ def load_stored_iot():
 
 
 
+@st.cache_data(show_spinner=False)
+def load_stored_eeg(patient_id):
+    patient_id = str(patient_id).zfill(4)
 
+    with zipfile.ZipFile(STORED_EEG_ZIP, "r") as z:
+        matches = [
+            n for n in z.namelist()
+            if n.lower().endswith(".mat")
+            and Path(n).name.startswith(patient_id)
+        ]
+
+        if not matches:
+            raise FileNotFoundError(
+                f"No EEG MAT found for patient {patient_id}"
+            )
+
+        mat_name = matches[0]
+        raw_bytes = z.read(mat_name)
+
+    with zipfile.ZipFile(STORED_HEA_ZIP, "r") as z:
+        hea_matches = [
+            n for n in z.namelist()
+            if n.lower().endswith(".hea")
+            and Path(n).name.startswith(patient_id)
+        ]
+
+        if not hea_matches:
+            raise FileNotFoundError(
+                f"No EEG HEA found for patient {patient_id}"
+            )
+
+        hea_name = hea_matches[0]
+        hea_bytes = z.read(hea_name)
+
+    return raw_bytes, hea_bytes, mat_name, hea_name
 # ============================================================
 # DASHBOARD
 # ============================================================
