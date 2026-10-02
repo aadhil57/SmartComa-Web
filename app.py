@@ -915,8 +915,7 @@ def create_monitor_plot():
 def load_all_dashboard_patient_ids():
     try:
         clinical_path = Path(
-            "/content/drive/MyDrive/SmartComa_EEG/"
-            "SmartComa_Clinical_200_Patients.csv"
+           "data/SmartComa_Clinical_200_Patients.csv"
         )
         df = pd.read_csv(clinical_path)
 
@@ -1053,10 +1052,10 @@ with st.sidebar:
 # STORED 200-PATIENT DEMO DATA
 # ============================================================
 
-STORED_EEG_ZIP = "/content/drive/MyDrive/SmartComa_EEG/EEG_200_Patients.zip"
+"STORED_IOT_CSV = "data/synthetic_iot_200_patients.csv"
 STORED_HEA_ZIP = "/content/drive/MyDrive/SmartComa_EEG/EEG_200_Metadata.zip"
 STORED_IOT_CSV = "/content/drive/MyDrive/SmartComa_EEG/synthetic_iot_200_patients.csv"
-STORED_CLINICAL_CSV = "/content/drive/MyDrive/SmartComa_EEG/SmartComa_Clinical_200_Patients.csv"
+STORED_CLINICAL_CSV = "data/SmartComa_Clinical_200_Patients.csv"
 STORED_MASTER_CSV = "data/SmartComa_Master_200_Patient_Map.csv"
 
 @st.cache_data(show_spinner=False)
