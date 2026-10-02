@@ -2901,13 +2901,13 @@ elif page == "🧑‍⚕️ Physiotherapy":
         )
     )
 
-    # Existing prediction keys used by the app
-    probability = st.session_state.get(
+    # Existing AI prediction keys used by the application
+    prediction_probability = st.session_state.get(
         "prediction",
         None
     )
 
-    status = st.session_state.get(
+    prediction_status = st.session_state.get(
         "patient_status",
         None
     )
@@ -2944,21 +2944,41 @@ elif page == "🧑‍⚕️ Physiotherapy":
 
     rosc = patient_clinical.get(
         "ROSC",
-        patient_clinical.get("rosс", None)
+        patient_clinical.get("rosc", None)
     )
 
     ohca = patient_clinical.get(
         "OHCA",
-        None
+        patient_clinical.get("ohca", None)
     )
 
     shockable = patient_clinical.get(
         "Shockable Rhythm",
         patient_clinical.get(
             "Shockable_Rhythm",
-            None
+            patient_clinical.get(
+                "shockable_rhythm",
+                None
+            )
         )
     )
+
+    # ========================================================
+    # SAFE DISPLAY HELPERS
+    # ========================================================
+
+    def safe_value(value, default="N/A"):
+
+        if value is None:
+            return default
+
+        try:
+            if not np.isfinite(float(value)):
+                return default
+        except (TypeError, ValueError):
+            pass
+
+        return value
 
     # ========================================================
     # HEADER
@@ -2979,17 +2999,17 @@ elif page == "🧑‍⚕️ Physiotherapy":
 
     st.html(f"""
         <div class="warning-box">
+            ⚠️ This module provides prototype decision-support
+            information for clinician review. It does not provide
+            autonomous medical prescriptions or treatment orders.
 
-        ⚠️ This module provides prototype decision-support
-        information for clinician review. It does not provide
-        autonomous medical prescriptions or treatment orders.
+            <br><br>
 
-        <br><br>
-
-        <b>Active Patient:</b> {patient_id}
-
+            <b>Active Patient:</b> {patient_id}
         </div>
     """)
+
+    st.html("<br>")
 
     # ========================================================
     # PATIENT REHABILITATION CONTEXT
@@ -3005,25 +3025,30 @@ elif page == "🧑‍⚕️ Physiotherapy":
 
     with c1:
 
-        if probability is not None:
+        if prediction_probability is not None:
 
-            st.metric(
-                "AI Probability",
-                f"{probability * 100:.1f}%"
-            )
+            try:
+                probability_text = (
+                    f"{float(prediction_probability) * 100:.1f}%"
+                )
+            except (TypeError, ValueError):
+                probability_text = "N/A"
 
         else:
+            probability_text = "N/A"
 
-            st.metric(
-                "AI Probability",
-                "N/A"
-            )
+        st.metric(
+            "AI Probability",
+            probability_text
+        )
 
     with c2:
 
         st.metric(
             "AI Status",
-            status if status else "N/A"
+            prediction_status
+            if prediction_status
+            else "N/A"
         )
 
     with c3:
@@ -3061,112 +3086,168 @@ elif page == "🧑‍⚕️ Physiotherapy":
     st.html("<br>")
 
     # ========================================================
-    # PATIENT CONTEXT
+    # PATIENT CONTEXT + MOVEMENT MONITORING
+    # Both are proper boxes
     # ========================================================
 
     p1, p2 = st.columns(2)
 
+    # --------------------------------------------------------
+    # PATIENT CONTEXT BOX
+    # --------------------------------------------------------
+
     with p1:
 
-        st.html("""
+        age_display = safe_value(age)
+
+        if age_display != "N/A":
+            age_display = f"{float(age_display):.0f} years"
+
+        temp_display = safe_value(temperature)
+
+        if temp_display != "N/A":
+            temp_display = f"{float(temp_display):.2f} °C"
+
+        rosc_display = safe_value(rosc)
+        ohca_display = safe_value(ohca)
+        shockable_display = safe_value(shockable)
+
+        st.html(f"""
             <div class="card">
 
                 <div class="card-title">
                     PATIENT CONTEXT
                 </div>
+
+                <div style="
+                    margin-top:14px;
+                    line-height:2;
+                    font-size:16px;
+                ">
+
+                    <b>Age:</b>
+                    {age_display}
+
+                    <br>
+
+                    <b>Body Temperature:</b>
+                    {temp_display}
+
+                    <br>
+
+                    <b>ROSC:</b>
+                    {rosc_display}
+
+                    <br>
+
+                    <b>OHCA:</b>
+                    {ohca_display}
+
+                    <br>
+
+                    <b>Shockable Rhythm:</b>
+                    {shockable_display}
+
+                </div>
+
+            </div>
         """)
 
-        if age is not None:
-
-            try:
-
-                st.write(
-                    f"**Age:** {float(age):.0f} years"
-                )
-
-            except:
-
-                st.write(
-                    f"**Age:** {age}"
-                )
-
-        if temperature is not None:
-
-            st.write(
-                f"**Body Temperature:** "
-                f"{temperature:.2f} °C"
-            )
-
-        if rosc is not None:
-
-            st.write(
-                f"**ROSC:** {rosc}"
-            )
-
-        if ohca is not None:
-
-            st.write(
-                f"**OHCA:** {ohca}"
-            )
-
-        if shockable is not None:
-
-            st.write(
-                f"**Shockable Rhythm:** {shockable}"
-            )
-
-        st.html("</div>")
+    # --------------------------------------------------------
+    # MOVEMENT MONITORING BOX
+    # --------------------------------------------------------
 
     with p2:
 
-        st.html("""
-            <div class="card">
-
-                <div class="card-title">
-                    MOVEMENT MONITORING
-                </div>
-        """)
-
         if movement_value is not None:
 
-            st.write(
-                f"**Movement Mean:** "
+            movement_display = (
                 f"{movement_value:.3f}"
             )
 
             if movement_value < 0.30:
 
-                st.write(
+                movement_note = (
                     "Low movement level observed "
                     "in the stored monitoring data."
                 )
 
+                movement_category = (
+                    "Low Mobility"
+                )
+
             elif movement_value < 0.70:
 
-                st.write(
+                movement_note = (
                     "Moderate movement level observed "
                     "in the stored monitoring data."
                 )
 
+                movement_category = (
+                    "Moderate Mobility"
+                )
+
             else:
 
-                st.write(
+                movement_note = (
                     "Higher movement level observed "
                     "in the stored monitoring data."
                 )
 
+                movement_category = (
+                    "Higher Mobility"
+                )
+
         else:
 
-            st.write(
+            movement_display = "N/A"
+
+            movement_note = (
                 "Movement data is not currently available."
             )
 
-        st.html("</div>")
+            movement_category = (
+                "Unavailable"
+            )
+
+        st.html(f"""
+            <div class="card">
+
+                <div class="card-title">
+                    MOVEMENT MONITORING
+                </div>
+
+                <div style="
+                    margin-top:14px;
+                    font-size:22px;
+                    font-weight:800;
+                ">
+                    {movement_display}
+                </div>
+
+                <div style="
+                    margin-top:6px;
+                    font-size:15px;
+                    font-weight:700;
+                ">
+                    {movement_category}
+                </div>
+
+                <div style="
+                    margin-top:12px;
+                    line-height:1.6;
+                    font-size:15px;
+                ">
+                    {movement_note}
+                </div>
+
+            </div>
+        """)
 
     st.html("<br>")
 
     # ========================================================
-    # AI-ASSISTED VIDEO RECOMMENDATION
+    # AI-ASSISTED REHABILITATION VIDEO RECOMMENDATION
     # ========================================================
 
     st.html("""
@@ -3175,33 +3256,9 @@ elif page == "🧑‍⚕️ Physiotherapy":
         </div>
     """)
 
-    # --------------------------------------------------------
-    # Recommendation engine
-    # --------------------------------------------------------
-
-    recommendation_type = (
-        "General Rehabilitation Education"
-    )
-
-    recommendation_reason = (
-        "Movement data is unavailable, so the system "
-        "cannot select a movement-specific category."
-    )
-
-    video_title = (
-        "Stroke Rehabilitation – "
-        "General Physiotherapy Education"
-    )
-
-    video_url = (
-        "https://www.youtube.com/results"
-        "?search_query=stroke+rehabilitation"
-        "+physiotherapy+education"
-    )
-
-    # --------------------------------------------------------
-    # AI-assisted recommendation based on movement
-    # --------------------------------------------------------
+    # ========================================================
+    # AI RECOMMENDATION LOGIC
+    # ========================================================
 
     if movement_value is not None:
 
@@ -3237,9 +3294,9 @@ elif page == "🧑‍⚕️ Physiotherapy":
 
             recommendation_reason = (
                 f"Movement mean is {movement_value:.3f}. "
-                "The system has selected a supported "
-                "mobility rehabilitation education category "
-                "for clinician review."
+                "The system has selected a supported mobility "
+                "rehabilitation education category for "
+                "clinician review."
             )
 
             video_title = (
@@ -3277,8 +3334,31 @@ elif page == "🧑‍⚕️ Physiotherapy":
                 "+balance+mobility+exercises"
             )
 
+    else:
+
+        recommendation_type = (
+            "General Rehabilitation Education"
+        )
+
+        recommendation_reason = (
+            "Movement data is unavailable. "
+            "A movement-specific recommendation "
+            "cannot be generated."
+        )
+
+        video_title = (
+            "Stroke Rehabilitation – "
+            "General Physiotherapy Education"
+        )
+
+        video_url = (
+            "https://www.youtube.com/results"
+            "?search_query=stroke+rehabilitation"
+            "+physiotherapy+education"
+        )
+
     # ========================================================
-    # AI RECOMMENDATION CARD
+    # RECOMMENDATION CARD
     # ========================================================
 
     st.html(f"""
@@ -3289,18 +3369,18 @@ elif page == "🧑‍⚕️ Physiotherapy":
             </div>
 
             <div style="
+                margin-top:14px;
                 font-size:22px;
                 font-weight:800;
-                margin-top:10px;
             ">
                 {recommendation_type}
             </div>
 
-            <div class="card-small"
-                 style="
-                    margin-top:12px;
-                    font-size:16px;
-                 ">
+            <div style="
+                margin-top:14px;
+                font-size:15px;
+                line-height:1.6;
+            ">
 
                 <b>Why this was selected:</b><br>
 
@@ -3310,18 +3390,17 @@ elif page == "🧑‍⚕️ Physiotherapy":
 
             <div style="
                 margin-top:18px;
-                font-size:18px;
+                font-size:17px;
                 font-weight:700;
             ">
-
                 Recommended Educational Video
-
             </div>
 
-            <div class="card-small">
-
-                {video_title}
-
+            <div style="
+                margin-top:8px;
+                font-size:16px;
+            ">
+                🎥 {video_title}
             </div>
 
         </div>
@@ -3329,38 +3408,39 @@ elif page == "🧑‍⚕️ Physiotherapy":
 
     st.html("<br>")
 
-    # ========================================================
-    # VIDEO BUTTON
-    # ========================================================
-
     st.link_button(
-        "▶ Watch AI-Recommended Rehabilitation Video",
+        "▶ Watch Recommended Rehabilitation Video",
         video_url,
         width="stretch"
     )
 
+    st.html("<br>")
+
+    # ========================================================
+    # CLINICIAN REVIEW WARNING
+    # ========================================================
+
     st.html("""
-        <div class="warning-box"
-             style="margin-top:15px;">
+        <div class="warning-box">
 
-        ⚠️ <b>Clinician Review Required</b>
+            ⚠️ <b>Clinician Review Required</b>
 
-        <br><br>
+            <br><br>
 
-        The AI recommendation identifies an educational
-        rehabilitation category using the available patient
-        monitoring information.
+            The AI recommendation identifies an educational
+            rehabilitation category using the available
+            patient monitoring information.
 
-        <br><br>
+            <br><br>
 
-        The system does <b>not</b> prescribe exercises,
-        treatment intensity, duration, frequency or dosage.
+            The system does <b>not</b> prescribe exercises,
+            treatment intensity, duration, frequency or dosage.
 
-        <br><br>
+            <br><br>
 
-        A qualified clinician or physiotherapist must decide
-        whether the educational resource is appropriate for
-        the individual patient.
+            A qualified clinician or physiotherapist must
+            decide whether the educational resource is
+            appropriate for the individual patient.
 
         </div>
     """)
@@ -3389,20 +3469,21 @@ elif page == "🧑‍⚕️ Physiotherapy":
                 </div>
 
                 <div style="
-                    font-size:20px;
+                    margin-top:10px;
+                    font-size:19px;
                     font-weight:800;
-                    margin-top:8px;
                 ">
                     Pressure-relief assessment
                 </div>
 
-                <div class="card-small">
-
-                    Review patient positioning,
-                    pressure points and bed positioning
-                    according to the responsible
-                    clinical protocol.
-
+                <div style="
+                    margin-top:10px;
+                    line-height:1.6;
+                    font-size:15px;
+                ">
+                    Review patient positioning, pressure
+                    points and bed positioning according
+                    to the responsible clinical protocol.
                 </div>
 
             </div>
@@ -3418,20 +3499,21 @@ elif page == "🧑‍⚕️ Physiotherapy":
                 </div>
 
                 <div style="
-                    font-size:20px;
+                    margin-top:10px;
+                    font-size:19px;
                     font-weight:800;
-                    margin-top:8px;
                 ">
                     Range-of-motion assessment
                 </div>
 
-                <div class="card-small">
-
-                    Clinician may assess passive range
-                    of motion and determine whether
-                    appropriate rehabilitation activity
-                    is indicated.
-
+                <div style="
+                    margin-top:10px;
+                    line-height:1.6;
+                    font-size:15px;
+                ">
+                    Clinician may assess passive range of
+                    motion and determine whether appropriate
+                    rehabilitation activity is indicated.
                 </div>
 
             </div>
@@ -3447,19 +3529,21 @@ elif page == "🧑‍⚕️ Physiotherapy":
                 </div>
 
                 <div style="
-                    font-size:20px;
+                    margin-top:10px;
+                    font-size:19px;
                     font-weight:800;
-                    margin-top:8px;
                 ">
                     Monitor movement behaviour
                 </div>
 
-                <div class="card-small">
-
+                <div style="
+                    margin-top:10px;
+                    line-height:1.6;
+                    font-size:15px;
+                ">
                     Compare movement measurements across
                     monitoring windows and review changes
                     with the patient's clinical condition.
-
                 </div>
 
             </div>
@@ -3467,36 +3551,44 @@ elif page == "🧑‍⚕️ Physiotherapy":
 
         st.html("<br>")
 
-        if (
-            status == "POOR"
-            or (
-                probability is not None
-                and probability >= 0.68
-            )
-        ):
+        if prediction_status == "POOR":
 
             escalation_title = (
                 "Enhanced clinician review"
             )
 
             escalation_text = (
-                "AI output is at or above the project "
-                "decision threshold. The responsible "
-                "clinical team should review the patient "
-                "before rehabilitation decisions."
+                "The current AI output is classified as "
+                "POOR according to the project decision "
+                "threshold. The responsible clinical team "
+                "should review the patient before making "
+                "rehabilitation decisions."
             )
 
-        else:
+        elif prediction_status == "GOOD":
 
             escalation_title = (
                 "Routine clinician review"
             )
 
             escalation_text = (
-                "AI output is below the project decision "
+                "The current AI output is classified as "
+                "GOOD according to the project decision "
                 "threshold. Continue clinical assessment "
                 "and monitoring before making rehabilitation "
                 "decisions."
+            )
+
+        else:
+
+            escalation_title = (
+                "AI assessment unavailable"
+            )
+
+            escalation_text = (
+                "Run the patient AI analysis to obtain the "
+                "current model output. Clinical assessment "
+                "remains required."
             )
 
         st.html(f"""
@@ -3507,17 +3599,19 @@ elif page == "🧑‍⚕️ Physiotherapy":
                 </div>
 
                 <div style="
-                    font-size:20px;
+                    margin-top:10px;
+                    font-size:19px;
                     font-weight:800;
-                    margin-top:8px;
                 ">
                     {escalation_title}
                 </div>
 
-                <div class="card-small">
-
+                <div style="
+                    margin-top:10px;
+                    line-height:1.6;
+                    font-size:15px;
+                ">
                     {escalation_text}
-
                 </div>
 
             </div>
@@ -3532,18 +3626,18 @@ elif page == "🧑‍⚕️ Physiotherapy":
     st.html("""
         <div class="warning-box">
 
-        🧑‍⚕️ <b>Clinician Review Required</b>
+            🧑‍⚕️ <b>Clinician Review Required</b>
 
-        <br><br>
+            <br><br>
 
-        The Smart Coma Patient Monitoring System provides
-        AI-assisted rehabilitation-support information and
-        educational video recommendations.
+            The Smart Coma Patient Monitoring System provides
+            AI-assisted rehabilitation-support information
+            and educational video recommendations.
 
-        <br><br>
+            <br><br>
 
-        It does not autonomously diagnose, prescribe,
-        or order treatment.
+            It does not autonomously diagnose, prescribe,
+            or order treatment.
 
         </div>
     """)
