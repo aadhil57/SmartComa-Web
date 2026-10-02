@@ -1101,48 +1101,52 @@ def get_hf_eeg_files():
     )
     return files
 
+HF_EEG_ZIP = "EEG_200_Patients.zip"
+HF_HEA_ZIP = "EEG_200_Metadata.zip"
 
-def ensure_hf_eeg_file(patient_id, extension):
-    patient_id = str(patient_id).zfill(4)
-    extension = extension.lower()
 
-    files = get_hf_eeg_files()
-
-    matches = [
-        f for f in files
-        if f.lower().endswith(extension)
-        and patient_id in Path(f).name
-    ]
-
-    if not matches:
-        raise FileNotFoundError(
-            f"No {extension} EEG file found for patient {patient_id} "
-            f"in Hugging Face dataset."
-        )
-
+@st.cache_data(show_spinner=False)
+def get_hf_zip(zip_name):
     return hf_hub_download(
         repo_id=HF_REPO_ID,
         repo_type=HF_REPO_TYPE,
-        filename=matches[0],
+        filename=zip_name,
         token=st.secrets["HF_TOKEN"]
     )
 
 
 @st.cache_data(show_spinner=False)
+def find_hf_eeg_file(patient_id, extension):
+    patient_id = str(patient_id).zfill(4)
+    extension = extension.lower()
+
+    zip_name = HF_EEG_ZIP if extension == ".mat" else HF_HEA_ZIP
+    zip_path = get_hf_zip(zip_name)
+
+    with zipfile.ZipFile(zip_path, "r") as z:
+        matches = [
+            name for name in z.namelist()
+            if name.lower().endswith(extension)
+            and patient_id in Path(name).name
+        ]
+
+        if not matches:
+            raise FileNotFoundError(
+                f"No {extension} EEG file found for patient {patient_id} "
+                f"inside {zip_name}"
+            )
+
+        file_name = matches[0]
+        file_bytes = z.read(file_name)
+
+    return file_bytes, Path(file_name).name
+
+@st.cache_data(show_spinner=False)
 def load_stored_eeg(patient_id):
     patient_id = str(patient_id).zfill(4)
 
-    mat_path = ensure_hf_eeg_file(patient_id, ".mat")
-    hea_path = ensure_hf_eeg_file(patient_id, ".hea")
-
-    with open(mat_path, "rb") as f:
-        raw_bytes = f.read()
-
-    with open(hea_path, "rb") as f:
-        hea_bytes = f.read()
-
-    mat_name = Path(mat_path).name
-    hea_name = Path(hea_path).name
+    raw_bytes, mat_name = find_hf_eeg_file(patient_id, ".mat")
+    hea_bytes, hea_name = find_hf_eeg_file(patient_id, ".hea")
 
     return raw_bytes, hea_bytes, mat_name, hea_name
 # ============================================================
