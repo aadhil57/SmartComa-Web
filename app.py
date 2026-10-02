@@ -2553,6 +2553,91 @@ elif page == "📡 Live Monitoring":
 
 elif page == "🩺 Clinical Information":
 
+    patient_id = st.session_state.get(
+        "active_patient_id",
+        st.session_state.get(
+            "selected_dashboard_patient",
+            "0299"
+        )
+    )
+
+    patient_clinical = st.session_state.get(
+        "active_patient_clinical",
+        {}
+    ) or {}
+
+    age = patient_clinical.get("Age", None)
+    sex = patient_clinical.get("Sex", None)
+    rosc = patient_clinical.get("ROSC", None)
+    ohca = patient_clinical.get("OHCA", None)
+    shockable = patient_clinical.get(
+        "Shockable_Rhythm",
+        None
+    )
+    ttm = patient_clinical.get("TTM", None)
+
+    def display_value(value, default="N/A"):
+        if value is None:
+            return default
+
+        try:
+            if pd.isna(value):
+                return default
+        except Exception:
+            pass
+
+        return value
+
+    age_display = display_value(age)
+
+    if age_display != "N/A":
+        age_display = f"{float(age_display):.0f}"
+
+    sex_display = display_value(sex)
+
+    if sex_display == "N/A":
+        sex_encoded = patient_clinical.get(
+            "Sex_Encoded",
+            None
+        )
+
+        if sex_encoded is not None:
+            sex_display = (
+                "Male"
+                if float(sex_encoded) == 0
+                else "Female"
+            )
+
+    ohca_display = display_value(ohca)
+
+    if ohca_display != "N/A":
+        ohca_display = (
+            "YES"
+            if float(ohca_display) == 1
+            else "NO"
+        )
+
+    shockable_display = display_value(
+        shockable
+    )
+
+    if shockable_display != "N/A":
+        shockable_display = (
+            "YES"
+            if float(shockable_display) == 1
+            else "NO"
+        )
+
+    rosc_display = display_value(rosc)
+
+    if rosc_display != "N/A":
+        rosc_display = f"{float(rosc_display):.1f}"
+
+    ttm_display = display_value(ttm)
+
+    if ttm_display != "N/A":
+        ttm_display = f"{float(ttm_display):.1f} °C"
+
     st.html("""
         <div class="topbar">
             <div class="main-title">
@@ -2564,46 +2649,70 @@ elif page == "🩺 Clinical Information":
         </div>
         """)
 
+    st.html(
+        f"""
+        <div class="info-pill">
+            Active Patient: {patient_id}
+        </div>
+        """
+    )
+
     c1, c2, c3 = st.columns(3)
 
     with c1:
 
-        st.html("""
+        st.html(
+            f"""
             <div class="card">
                 <div class="card-title">Age</div>
-                <div class="card-value">45</div>
+                <div class="card-value">
+                    {age_display}
+                </div>
                 <div class="card-small">
                     Patient demographic
                 </div>
             </div>
-            """)
+            """
+        )
 
     with c2:
 
-        st.html("""
+        st.html(
+            f"""
             <div class="card">
                 <div class="card-title">OHCA</div>
-                <div class="card-value">YES</div>
+                <div class="card-value">
+                    {ohca_display}
+                </div>
                 <div class="card-small">
                     Out-of-hospital cardiac arrest
                 </div>
             </div>
-            """)
+            """
+        )
 
     with c3:
 
-        st.html("""
+        st.html(
+            f"""
             <div class="card">
-                <div class="card-title">Shockable Rhythm</div>
-                <div class="card-value">YES</div>
+                <div class="card-title">
+                    Shockable Rhythm
+                </div>
+                <div class="card-value">
+                    {shockable_display}
+                </div>
                 <div class="card-small">
                     Clinical feature
                 </div>
             </div>
-            """)
+            """
+        )
 
     st.html(
-        '<div class="section-title">Clinical Features</div>'
+        '<div class="section-title">'
+        'Clinical Features'
+        '</div>'
     )
 
     clinical_table = pd.DataFrame({
@@ -2616,12 +2725,14 @@ elif page == "🩺 Clinical Information":
             "TTM"
         ],
         "Value": [
-            "45 years",
-            "Male",
-            "20.0",
-            "Yes",
-            "Yes",
-            "33 °C"
+            f"{age_display} years"
+            if age_display != "N/A"
+            else "N/A",
+            sex_display,
+            rosc_display,
+            ohca_display,
+            shockable_display,
+            ttm_display
         ],
         "AI Role": [
             "Demographic",
@@ -2638,7 +2749,6 @@ elif page == "🩺 Clinical Information":
         use_container_width=True,
         hide_index=True
     )
-
 
 # ============================================================
 # AI PREDICTION
