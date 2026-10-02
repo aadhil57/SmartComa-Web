@@ -620,16 +620,6 @@ def normalize_iot(
         (values - means) / stds
     ).astype(np.float32)
 
-
-def normalize_clinical(
-    age,
-    rosc,
-    ttm,
-    ohca,
-    shockable,
-    sex
-):
-
     # Train-set preprocessing values.
     # Missing values use train-set medians/modes.
 
