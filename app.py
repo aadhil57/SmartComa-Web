@@ -633,20 +633,28 @@ def normalize_clinical(
     # Train-set preprocessing values.
     # Missing values use train-set medians/modes.
 
-  if rosc is None or not np.isfinite(rosc):
-    rosc = 20.0
+def normalize_clinical(
+    age,
+    rosc,
+    ttm,
+    ohca,
+    shockable,
+    sex
+):
+    if rosc is None or not np.isfinite(rosc):
+        rosc = 20.0
 
-if ttm is None or not np.isfinite(ttm):
-    ttm = 33.0
+    if ttm is None or not np.isfinite(ttm):
+        ttm = 33.0
 
-if ohca is None or not np.isfinite(ohca):
-    ohca = 1.0
+    if ohca is None or not np.isfinite(ohca):
+        ohca = 1.0
 
-if shockable is None or not np.isfinite(shockable):
-    shockable = 1.0
+    if shockable is None or not np.isfinite(shockable):
+        shockable = 1.0
 
-if sex is None or not np.isfinite(sex):
-    sex = 0
+    if sex is None or not np.isfinite(sex):
+        sex = 0
 
     values = np.array([
         age,
