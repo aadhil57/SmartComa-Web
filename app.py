@@ -1052,7 +1052,7 @@ with st.sidebar:
 # STORED 200-PATIENT DEMO DATA
 # ============================================================
 
-"STORED_IOT_CSV = "data/synthetic_iot_200_patients.csv"
+STORED_IOT_CSV = "data/synthetic_iot_200_patients.csv"
 STORED_HEA_ZIP = "/content/drive/MyDrive/SmartComa_EEG/EEG_200_Metadata.zip"
 STORED_IOT_CSV = "/content/drive/MyDrive/SmartComa_EEG/synthetic_iot_200_patients.csv"
 STORED_CLINICAL_CSV = "data/SmartComa_Clinical_200_Patients.csv"
