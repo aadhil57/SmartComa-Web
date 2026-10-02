@@ -2355,6 +2355,63 @@ elif page == "🧠 EEG Analysis":
 
 elif page == "📡 Live Monitoring":
 
+    patient_id = st.session_state.get(
+        "active_patient_id",
+        st.session_state.get(
+            "selected_dashboard_patient",
+            "0299"
+        )
+    )
+
+    patient_iot = st.session_state.get(
+        "active_patient_iot",
+        {}
+    ) or {}
+
+    heart_rate = patient_iot.get(
+        "heart_rate_mean",
+        None
+    )
+
+    temperature = patient_iot.get(
+        "body_temperature_mean",
+        None
+    )
+
+    movement = patient_iot.get(
+        "movement_mean",
+        None
+    )
+
+    metrics = [
+        (
+            "❤️ Heart Rate",
+            f"{heart_rate:.2f} BPM"
+            if heart_rate is not None
+            else "N/A",
+            "Stored IoT data"
+        ),
+        (
+            "🌡️ Temperature",
+            f"{temperature:.2f} °C"
+            if temperature is not None
+            else "N/A",
+            "Stored IoT data"
+        ),
+        (
+            "📡 Movement",
+            f"{movement:.3f}"
+            if movement is not None
+            else "N/A",
+            "Stored IoT data"
+        ),
+        (
+            "🧠 EEG",
+            "ACTIVE",
+            "19 channels"
+        )
+    ]
+
     st.html("""
         <div class="topbar">
             <div class="main-title">
@@ -2368,63 +2425,6 @@ elif page == "📡 Live Monitoring":
         """)
 
     c1, c2, c3, c4 = st.columns(4)
-
- patient_id = st.session_state.get(
-    "active_patient_id",
-    st.session_state.get(
-        "selected_dashboard_patient",
-        "0299"
-    )
-)
-
-patient_iot = st.session_state.get(
-    "active_patient_iot",
-    {}
-) or {}
-
-heart_rate = patient_iot.get(
-    "heart_rate_mean",
-    None
-)
-
-temperature = patient_iot.get(
-    "body_temperature_mean",
-    None
-)
-
-movement = patient_iot.get(
-    "movement_mean",
-    None
-)
-
-metrics = [
-    (
-        "❤️ Heart Rate",
-        f"{heart_rate:.2f} BPM"
-        if heart_rate is not None
-        else "N/A",
-        "Stored IoT data"
-    ),
-    (
-        "🌡️ Temperature",
-        f"{temperature:.2f} °C"
-        if temperature is not None
-        else "N/A",
-        "Stored IoT data"
-    ),
-    (
-        "📡 Movement",
-        f"{movement:.3f}"
-        if movement is not None
-        else "N/A",
-        "Stored IoT data"
-    ),
-    (
-        "🧠 EEG",
-        "ACTIVE",
-        "19 channels"
-    )
-]
 
     for col, data in zip(
         [c1, c2, c3, c4],
