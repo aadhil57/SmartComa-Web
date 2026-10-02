@@ -8,7 +8,7 @@ warnings.filterwarnings("ignore")
 import numpy as np
 import pandas as pd
 import streamlit as st
-from huggingface_hub import hf_hub_download
+from huggingface_hub import HfApi, hf_hub_download
 # SMARTCOMA_HTML_DEDENT_PATCH
 import textwrap
 
