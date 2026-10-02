@@ -1996,16 +1996,16 @@ elif page == "📂 Stored Patient Demo":
                     ).reshape(1, -1)
 
 
-pred = model.predict(
-    {
-        "eeg_input": eeg_input,
-        "iot_input": iot_input,
-        "clinical_input": clinical_input
-    },
-    verbose=0
-)[0][0]
+ pred = model.predict(
+                        {
+                            "eeg_input": eeg_input,
+                            "iot_input": iot_input,
+                            "clinical_input": clinical_input
+                        },
+                        verbose=0
+                    )[0][0]
 
-probs.append(float(pred))
+                    probs.append(float(pred))
 
                 probability = float(np.mean(probs))
 
