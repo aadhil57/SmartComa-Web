@@ -44,21 +44,11 @@ st.set_page_config(
 # PATHS
 # ============================================================
 
-MODEL_PATH = (
-    "/content/drive/MyDrive/SmartComa_EEG/"
-    "Fusion_Checkpoints/Fusion_V1_best_val_auc.keras"
-)
+MODEL_PATH = "models/Fusion_V1_best_val_auc.keras"
 
-EEG_STATS_PATH = (
-    "/content/drive/MyDrive/SmartComa_EEG/"
-    "EEG_10sec_Train_Only_Normalization_Stats.csv"
-)
+EEG_STATS_PATH = "data/EEG_10sec_Train_Only_Normalization_Stats.csv"
 
-MULTI_STATS_PATH = (
-    "/content/drive/MyDrive/SmartComa_EEG/"
-    "Multimodal_TrainOnly_Normalization_Stats.csv"
-)
-
+MULTI_STATS_PATH = "data/Multimodal_TrainOnly_Normalization_Stats.csv"
 
 # ============================================================
 # PROJECT SETTINGS
