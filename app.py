@@ -1088,41 +1088,61 @@ def load_stored_iot():
 
     return agg
 
+HF_REPO_ID = "aadhil57786/SmartComa-EEG-200"
+HF_REPO_TYPE = "dataset"
+
+
+@st.cache_data(show_spinner=False)
+def get_hf_eeg_files():
+    api = HfApi(token=st.secrets["HF_TOKEN"])
+    files = api.list_repo_files(
+        repo_id=HF_REPO_ID,
+        repo_type=HF_REPO_TYPE
+    )
+    return files
+
+
+def ensure_hf_eeg_file(patient_id, extension):
+    patient_id = str(patient_id).zfill(4)
+    extension = extension.lower()
+
+    files = get_hf_eeg_files()
+
+    matches = [
+        f for f in files
+        if f.lower().endswith(extension)
+        and patient_id in Path(f).name
+    ]
+
+    if not matches:
+        raise FileNotFoundError(
+            f"No {extension} EEG file found for patient {patient_id} "
+            f"in Hugging Face dataset."
+        )
+
+    return hf_hub_download(
+        repo_id=HF_REPO_ID,
+        repo_type=HF_REPO_TYPE,
+        filename=matches[0],
+        token=st.secrets["HF_TOKEN"]
+    )
 
 
 @st.cache_data(show_spinner=False)
 def load_stored_eeg(patient_id):
     patient_id = str(patient_id).zfill(4)
 
-    with zipfile.ZipFile(STORED_EEG_ZIP, "r") as z:
-        matches = [
-            n for n in z.namelist()
-            if n.lower().endswith(".mat")
-            and Path(n).name.startswith(patient_id)
-        ]
+    mat_path = ensure_hf_eeg_file(patient_id, ".mat")
+    hea_path = ensure_hf_eeg_file(patient_id, ".hea")
 
-        if not matches:
-            raise FileNotFoundError(
-                f"No EEG MAT found for patient {patient_id}"
-            )
+    with open(mat_path, "rb") as f:
+        raw_bytes = f.read()
 
-        mat_name = matches[0]
-        raw_bytes = z.read(mat_name)
+    with open(hea_path, "rb") as f:
+        hea_bytes = f.read()
 
-    with zipfile.ZipFile(STORED_HEA_ZIP, "r") as z:
-        hea_matches = [
-            n for n in z.namelist()
-            if n.lower().endswith(".hea")
-            and Path(n).name.startswith(patient_id)
-        ]
-
-        if not hea_matches:
-            raise FileNotFoundError(
-                f"No EEG HEA found for patient {patient_id}"
-            )
-
-        hea_name = hea_matches[0]
-        hea_bytes = z.read(hea_name)
+    mat_name = Path(mat_path).name
+    hea_name = Path(hea_path).name
 
     return raw_bytes, hea_bytes, mat_name, hea_name
 # ============================================================
