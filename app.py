@@ -1710,12 +1710,17 @@ if page == "🏠 Dashboard":
                 </div>
 
                 <div style="
-                    font-size:40px;
-                    font-weight:800;
-                    margin-top:8px;
-                ">
-                    {probability_text}
-                </div>
+    font-size:40px;
+    font-weight:800;
+    margin-top:8px;
+">
+    {(
+        f"{float(prediction_probability) * 100:.2f}%"
+        if prediction_probability is not None
+        and np.isfinite(float(prediction_probability))
+        else "N/A"
+    )}
+</div>
 
                 <div class="good"
                      style="font-size:18px;">
@@ -2901,16 +2906,15 @@ elif page == "🧑‍⚕️ Physiotherapy":
         )
     )
 
-    prediction_probability = st.session_state.get(
-        "prediction",
-        None
-    )
+prediction_probability = st.session_state.get(
+    "prediction_probability",
+    None
+)
 
-    prediction_status = st.session_state.get(
-        "patient_status",
-        None
-    )
-
+prediction_status = st.session_state.get(
+    "prediction_status",
+    None
+)
     patient_iot = st.session_state.get(
         "active_patient_iot",
         {}
