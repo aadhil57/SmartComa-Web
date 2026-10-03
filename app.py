@@ -3029,43 +3029,47 @@ elif page == "🧑‍⚕️ Physiotherapy":
 
     with c1:
 
-        if prediction_probability is not None:
+        # --------------------------------------------------------
+# MULTIMODAL AI PROBABILITY
+# --------------------------------------------------------
 
-            try:
+if prediction_probability is not None:
 
-                probability_value = float(
-                    prediction_probability
-                )
+    try:
 
-                if np.isfinite(probability_value):
+        probability_value = float(
+            prediction_probability
+        )
 
-                    probability_text = (
-                        f"{probability_value * 100:.1f}%"
-                    )
+        # Handle both formats:
+        # 0.2872  -> 28.72%
+        # 28.72   -> 28.72%
 
-                else:
+        if np.isfinite(probability_value):
 
-                    probability_text = (
-                        "AI Analysis Required"
-                    )
-
-            except (TypeError, ValueError):
+            if probability_value <= 1:
 
                 probability_text = (
-                    "AI Analysis Required"
+                    f"{probability_value * 100:.2f}%"
+                )
+
+            else:
+
+                probability_text = (
+                    f"{probability_value:.2f}%"
                 )
 
         else:
 
-            probability_text = (
-                "AI Analysis Required"
-            )
+            probability_text = "N/A"
 
-        st.metric(
-            "AI Probability",
-            probability_text
-        )
+    except (TypeError, ValueError):
 
+        probability_text = "N/A"
+
+else:
+
+    probability_text = "N/A"
     # --------------------------------------------------------
     # AI STATUS
     # --------------------------------------------------------
