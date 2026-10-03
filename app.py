@@ -2897,7 +2897,6 @@ elif page == "🧑‍⚕️ Physiotherapy":
     # ========================================================
     # ACTIVE PATIENT DATA
     # ========================================================
-
     patient_id = st.session_state.get(
         "active_patient_id",
         st.session_state.get(
@@ -2906,15 +2905,16 @@ elif page == "🧑‍⚕️ Physiotherapy":
         )
     )
 
-prediction_probability = st.session_state.get(
-    "prediction_probability",
-    None
-)
+    prediction_probability = st.session_state.get(
+        "prediction_probability",
+        None
+    )
 
-prediction_status = st.session_state.get(
-    "prediction_status",
-    None
-)
+    prediction_status = st.session_state.get(
+        "prediction_status",
+        None
+    )
+
     patient_iot = st.session_state.get(
         "active_patient_iot",
         {}
