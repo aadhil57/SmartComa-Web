@@ -1584,15 +1584,18 @@ if page == "🏠 Dashboard":
     )
 
     # AI prediction
-    prediction = st.session_state.get(
-        "prediction",
+    # AI prediction
+    prediction_probability = st.session_state.get(
+        "prediction_probability",
         None
     )
 
     patient_status = st.session_state.get(
-        "patient_status",
+        "prediction_status",
         "GOOD"
     )
+
+    prediction = prediction_probability
 
     # Display values
     if heart_rate is not None:
@@ -3030,49 +3033,50 @@ elif page == "🧑‍⚕️ Physiotherapy":
     # --------------------------------------------------------
     # AI PROBABILITY
     # --------------------------------------------------------
- # --------------------------------------------------------
-# MULTIMODAL AI PROBABILITY
-# --------------------------------------------------------
-with c1:
+    # --------------------------------------------------------
+    # MULTIMODAL AI PROBABILITY
+    # --------------------------------------------------------
 
-    if prediction_probability is not None:
+    with c1:
 
-        try:
+        if prediction_probability is not None:
 
-            probability_value = float(
-                prediction_probability
-            )
+            try:
 
-            if np.isfinite(probability_value):
+                probability_value = float(
+                    prediction_probability
+                )
 
-                if probability_value <= 1:
+                if np.isfinite(probability_value):
 
-                    probability_text = (
-                        f"{probability_value * 100:.2f}%"
-                    )
+                    if probability_value <= 1:
+
+                        probability_text = (
+                            f"{probability_value * 100:.2f}%"
+                        )
+
+                    else:
+
+                        probability_text = (
+                            f"{probability_value:.2f}%"
+                        )
 
                 else:
 
-                    probability_text = (
-                        f"{probability_value:.2f}%"
-                    )
+                    probability_text = "N/A"
 
-            else:
+            except (TypeError, ValueError):
 
                 probability_text = "N/A"
 
-        except (TypeError, ValueError):
+        else:
 
             probability_text = "N/A"
 
-    else:
-
-        probability_text = "N/A"
-
-    st.metric(
-        "AI Probability",
-        probability_text
-    )
+        st.metric(
+            "AI Probability",
+            probability_text
+        )
     # --------------------------------------------------------
     # AI STATUS
     # --------------------------------------------------------
