@@ -1013,11 +1013,11 @@ with st.sidebar:
             "🏠 Dashboard",
             "📂 Stored Patient Demo",
             "👤 Patient Analysis",
-            "🧠 EEG Analysis",
-            "📡 Live Monitoring",
-            "🩺 Clinical Information",
-            "🤖 AI Prediction",
-            "🧑‍⚕️ Physiotherapy",
+            "▣ EEG Analysis",
+            "▣ Live Monitoring",
+            "▣ Clinical Information",
+            "▣ AI Prediction",
+            "▣ Physiotherapy",
             "🔬 About Project"
         ]
     )
