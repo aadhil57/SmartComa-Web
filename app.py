@@ -2559,7 +2559,7 @@ elif page == "📡 Live Monitoring":
 # CLINICAL INFORMATION
 # ============================================================
 
-elif page == "🩺 Clinical Information":
+elif page == "▣, Clinical Information":
 
     patient_id = st.session_state.get(
         "active_patient_id",
@@ -2762,7 +2762,7 @@ elif page == "🩺 Clinical Information":
 # AI PREDICTION
 # ============================================================
 
-elif page == "🤖 AI Prediction":
+elif page == "▣ AI Prediction":
 
     st.html("""
         <div class="topbar">
