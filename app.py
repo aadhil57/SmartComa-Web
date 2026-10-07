@@ -1010,15 +1010,15 @@ with st.sidebar:
     page = st.radio(
         "NAVIGATION",
         [
-            "▣ Dashboard",
+            "🏠 Dashboard",
             "📂 Stored Patient Demo",
-            "▣ Patient Analysis",
-            "▣ EEG Analysis",
-            "▣ Live Monitoring",
-            "▣ Clinical Information",
-            "▣ AI Prediction",
-            "▣ Physiotherapy",
-            "▣ About Project"
+            "👤 Patient Analysis",
+            "🧠 EEG Analysis",
+            "📡 Live Monitoring",
+            "🩺 Clinical Information",
+            "🤖 AI Prediction",
+            "🧑‍⚕️ Physiotherapy",
+            "🔬 About Project"
         ]
     )
 
